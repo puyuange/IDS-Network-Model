@@ -31,13 +31,12 @@ def I(node):
 def R(node):
     return node[4]
 
-def delta_seir(node):
+def delta_seir(node, params_dict):
     
-    global l
-    global beta
-    global c
-    global sigma
-    global gamma
+    beta = params_dict["beta"]
+    c = params_dict["c"]
+    sigma = params_dict["sigma"]
+    gamma = params_dict["gamma"]
 
     dS = - ((beta * c) * S(node) * I(node)) / N(node)
     dE = ((beta * c) * S(node) * I(node)) / N(node) - sigma * E(node)
@@ -76,7 +75,7 @@ def infected_enroute(fromnode, tonode, flow_matrix, freq_matrix, univ_matrix, pa
     L = s * (1-np.exp((-i * np.pi * np.square(r))/A)) * beta
     # later replace beta with 1-exp(-kT)
     
-    delta_array = delta_out(fromnode, tonode)
+    delta_array = delta_out(fromnode, tonode, flow_matrix, univ_matrix, partial_matrix)
     
     delta_array[1] = delta_array[1] - L
     delta_array[2] = delta_array[2] + L
@@ -92,7 +91,7 @@ def delta_travel(node, nodes, flow_matrix, freq_matrix, univ_matrix, partial_mat
     return intake - outtake
 
 def update_node_status(node, nodes, flow_matrix, freq_matrix, univ_matrix, partial_matrix, params_dict):
-    node += delta_seir(node)
+    node += delta_seir(node, params_dict)
     node += delta_travel(node, nodes, flow_matrix, freq_matrix, univ_matrix, partial_matrix, params_dict)
     return node
 
